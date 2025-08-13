@@ -146,13 +146,20 @@ const FirebaseVotingApp = () => {
         const data = snapshot.val();
         if (data) {
           const now = Date.now();
+          // Hacer el filtrado más permisivo: 10 minutos
           const filtered = Object.keys(data).reduce((acc, userId) => {
-            if (now - data[userId].lastActive < 300000) {
+            const lastActive = typeof data[userId].lastActive === 'number' 
+              ? data[userId].lastActive 
+              : Date.now();
+            if (now - lastActive < 600000) { // 10 minutos
               acc[userId] = data[userId];
             }
             return acc;
           }, {} as {[key: string]: ActiveUser});
           setActiveUsers(filtered);
+          console.log('Usuarios activos:', Object.keys(filtered).length, filtered);
+        } else {
+          setActiveUsers({});
         }
       });
 
@@ -292,28 +299,34 @@ const FirebaseVotingApp = () => {
   };
 
   const handleAddName = async () => {
-    if (!newName.trim() || !selectedCategory || !submitterName.trim()) {
-      alert('Por favor completa todos los campos');
+    if (!newName.trim() || !selectedCategory) {
+      alert('Por favor completa el nombre y selecciona una categoría');
       return;
     }
+
+    const finalSubmitterName = submitterName.trim() || confirmedVoter || 'Anónimo';
 
     try {
       const submission: UserSubmission = {
         name: newName.trim(),
-        submitter: submitterName.trim(),
+        submitter: finalSubmitterName,
         timestamp: Date.now()
       };
+
+      console.log('Agregando nombre:', submission, 'en categoría:', selectedCategory);
 
       const submissionRef = push(ref(database, `${DB_PATHS.userSubmissions}/${selectedCategory}`));
       await set(submissionRef, submission);
 
-      addNotification(`${submitterName.trim()} agregó "${newName.trim()}"`, 'submission');
+      addNotification(`${finalSubmitterName} agregó "${newName.trim()}"`, 'submission');
 
       setNewName('');
       setSubmitterName('');
       setSelectedCategory('');
       setShowAddForm(false);
       triggerConfetti();
+
+      console.log('Nombre agregado exitosamente');
     } catch (error) {
       console.error('Error al agregar nombre:', error);
       alert('Error al agregar nombre. Revisa la consola.');
@@ -365,9 +378,11 @@ const FirebaseVotingApp = () => {
   };
 
   const getTotalUserSubmissions = () => {
-    return Object.values(userSubmissions).reduce((total, categorySubmissions) => 
-      total + categorySubmissions.length, 0
+    const total = Object.values(userSubmissions).reduce((total, categorySubmissions) => 
+      total + (categorySubmissions?.length || 0), 0
     );
+    console.log('Ideas contribuidas:', total, userSubmissions);
+    return total;
   };
 
   return (
@@ -570,15 +585,18 @@ const FirebaseVotingApp = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Tu nombre
+                  Tu nombre (opcional)
                 </label>
                 <input
                   type="text"
                   value={submitterName}
                   onChange={(e) => setSubmitterName(e.target.value)}
-                  placeholder={confirmedVoter || "Tu nombre"}
+                  placeholder={confirmedVoter ? `${confirmedVoter} (predeterminado)` : "Tu nombre"}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  Si lo dejas vacío, usará "{confirmedVoter}"
+                </p>
               </div>
               
               <div>
