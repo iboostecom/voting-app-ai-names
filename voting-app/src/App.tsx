@@ -1,8 +1,8 @@
-import NamingVotingApp from './naming-voting-app'
+import FirebaseVotingApp from './FirebaseVotingApp'
 import './App.css'
 
 function App() {
-  return <NamingVotingApp />
+  return <FirebaseVotingApp />
 }
 
 export default App

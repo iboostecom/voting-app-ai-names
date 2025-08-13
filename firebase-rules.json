@@ -1,0 +1,29 @@
+{
+  "rules": {
+    "votes": {
+      "$userId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "userSubmissions": {
+      "$categoryId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "activeUsers": {
+      "$userId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "notifications": {
+      ".read": true,
+      ".write": true,
+      "$notificationId": {
+        ".validate": "newData.hasChildren(['message', 'timestamp', 'type'])"
+      }
+    }
+  }
+}

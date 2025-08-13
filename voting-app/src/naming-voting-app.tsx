@@ -1,15 +1,54 @@
-import React, { useState } from 'react';
-import { Heart, HeartOff, Plus, X, Check } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Heart, HeartOff, Plus, X, Check, Users, Bell, Zap, TrendingUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import confetti from 'canvas-confetti';
+import Confetti from 'react-confetti';
+import { database, DB_PATHS } from './firebase';
+import { ref, onValue, push, set, remove, serverTimestamp, off } from 'firebase/database';
+
+interface UserSubmission {
+  name: string;
+  submitter: string;
+  timestamp: number;
+}
+
+interface VoteData {
+  [voterName: string]: {
+    [voteKey: string]: boolean;
+  };
+}
+
+interface ActiveUser {
+  name: string;
+  lastActive: number;
+}
+
+interface Notification {
+  id: string;
+  message: string;
+  timestamp: number;
+  type: 'vote' | 'submission' | 'user';
+}
 
 const NamingVotingApp = () => {
-  const [votesByPerson, setVotesByPerson] = useState({});
+  // Estados originales
+  const [votesByPerson, setVotesByPerson] = useState<VoteData>({});
   const [currentVoter, setCurrentVoter] = useState('');
   const [showVoterForm, setShowVoterForm] = useState(true);
-  const [userSubmissions, setUserSubmissions] = useState({});
+  const [userSubmissions, setUserSubmissions] = useState<{[key: string]: UserSubmission[]}>({});
   const [showAddForm, setShowAddForm] = useState(false);
   const [newName, setNewName] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [submitterName, setSubmitterName] = useState('');
+
+  // Estados para funcionalidades divertidas
+  const [activeUsers, setActiveUsers] = useState<{[key: string]: ActiveUser}>({});
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [recentVotes, setRecentVotes] = useState<{[key: string]: number}>({});
+  
+  const userActivityRef = useRef<any>(null);
+  const lastNotificationRef = useRef<number>(Date.now());
 
   const categories = [
     {
