@@ -141,6 +141,7 @@ const FirebaseVotingApp = () => {
       const submissionsRef = ref(database, DB_PATHS.userSubmissions);
       onValue(submissionsRef, (snapshot) => {
         const data = snapshot.val();
+        console.log('📝 Submissions recibidas de Firebase:', data);
         setUserSubmissions(data || {});
       });
 
@@ -811,7 +812,7 @@ const FirebaseVotingApp = () => {
             </div>
 
             {/* Nombres agregados por usuarios */}
-            {userSubmissions[category.id] && userSubmissions[category.id].length > 0 && (
+            {userSubmissions[category.id] && userSubmissions[category.id].length > 0 ? (
               <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -893,6 +894,14 @@ const FirebaseVotingApp = () => {
                   })}
                 </div>
               </motion.div>
+            ) : (
+              // Debug: mostrar cuando no hay submissions
+              process.env.NODE_ENV === 'development' && (
+                <div className="text-xs text-gray-400 p-2 border border-dashed">
+                  Debug: No hay submissions para {category.id}. 
+                  userSubmissions: {JSON.stringify(userSubmissions[category.id] || 'undefined')}
+                </div>
+              )
             )}
           </motion.div>
         ))}
