@@ -2,16 +2,21 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 
-// Your web app's Firebase configuration
+// Your web app's Firebase configuration - using environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyClRMQUx1O6NyM42zVFqNi5dSoF17zE53g",
-  authDomain: "voting-app-ai-names.firebaseapp.com",
-  databaseURL: "https://voting-app-ai-names-default-rtdb.firebaseio.com",
-  projectId: "voting-app-ai-names",
-  storageBucket: "voting-app-ai-names.firebasestorage.app",
-  messagingSenderId: "1037191401272",
-  appId: "1:1037191401272:web:455c145dad73662f6abbcd"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
+
+// Validate configuration
+if (!firebaseConfig.apiKey) {
+  throw new Error('Firebase configuration is missing. Please check your .env file.');
+}
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
