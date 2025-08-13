@@ -3,24 +3,32 @@
     "votes": {
       "$userId": {
         ".read": true,
-        ".write": true
+        ".write": "$userId != null && $userId.length > 0 && $userId.length < 50",
+        ".validate": "newData.isString() || newData.isBoolean()",
+        "$voteKey": {
+          ".validate": "newData.isBoolean() && $voteKey.length < 100"
+        }
       }
     },
     "userSubmissions": {
       "$categoryId": {
         ".read": true,
-        ".write": true
+        ".write": "newData.hasChildren(['name', 'submitter', 'timestamp']) && newData.child('name').val().length > 0 && newData.child('name').val().length < 50 && newData.child('submitter').val().length > 0 && newData.child('submitter').val().length < 30",
+        "$submissionId": {
+          ".validate": "newData.hasChildren(['name', 'submitter', 'timestamp']) && newData.child('timestamp').isNumber() && newData.child('timestamp').val() <= now"
+        }
       }
     },
     "activeUsers": {
       "$userId": {
         ".read": true,
-        ".write": true
+        ".write": "$userId != null && $userId.length > 0 && $userId.length < 50",
+        ".validate": "newData.hasChildren(['name', 'lastActive']) && newData.child('name').val().length > 0 && newData.child('name').val().length < 30 && newData.child('lastActive').isNumber()"
       }
     },
     "notifications": {
       ".read": true,
-      ".write": true,
+      ".write": "newData.hasChildren(['message', 'timestamp', 'type']) && newData.child('message').val().length > 0 && newData.child('message').val().length < 200 && newData.child('timestamp').isNumber() && newData.child('timestamp').val() <= now && (newData.child('type').val() == 'vote' || newData.child('type').val() == 'submission' || newData.child('type').val() == 'user')",
       "$notificationId": {
         ".validate": "newData.hasChildren(['message', 'timestamp', 'type'])"
       }

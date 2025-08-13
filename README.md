@@ -45,17 +45,21 @@ npm install
 
 ### 2. Configurar Firebase (Para v2.0.0)
 
+⚠️ **IMPORTANTE**: Lee `SECURITY.md` antes de configurar Firebase.
+
 1. **Crear proyecto Firebase:**
    - Ve a https://console.firebase.google.com/
    - Crea un nuevo proyecto
    - Habilita Realtime Database
 
-2. **Configurar reglas de seguridad:**
-   - En Firebase Console → Realtime Database → Reglas  
-   - Copia el contenido de `firebase-rules.json`
+2. **Configurar variables de entorno:**
+   - Copia `voting-app/.env.example` a `voting-app/.env`
+   - Obtén tus credenciales desde Firebase Console → Project Settings → Your Apps
+   - **NUNCA** commitees el archivo `.env`
 
-3. **Actualizar configuración:**
-   - Modifica `voting-app/src/firebase.ts` con tu configuración
+3. **Configurar reglas de seguridad:**
+   - En Firebase Console → Realtime Database → Reglas  
+   - Copia el contenido de `firebase-rules.json` (incluye validaciones mejoradas)
 
 ### 3. Ejecutar la Aplicación
 
@@ -80,22 +84,32 @@ npm run dev
 
 ## 🔒 Seguridad y Privacidad
 
-### v2.0.0 (Firebase)
-- **Firebase Realtime Database**: Base de datos en tiempo real segura
-- **Reglas de Firebase**: Configuración de permisos incluida
-- **Sin autenticación**: Acceso abierto para facilitar uso
-- **Datos temporales**: Se pueden limpiar manualmente desde Firebase Console
-- **No información personal**: Solo nombres de usuario y votos
+⚠️ **ATENCIÓN**: Las credenciales originales fueron comprometidas. Consulta `SECURITY.md` para remediation completa.
+
+### v2.0.0 (Firebase) - Seguridad Mejorada
+- **Firebase Realtime Database**: Base de datos en tiempo real
+- **Reglas de validación mejoradas**: Límites de longitud, tipos de datos, rate limiting
+- **Sanitización de inputs**: Prevención de XSS y ataques de inyección
+- **Rate limiting del cliente**: Protección contra spam
+- **Variables de entorno**: Credenciales protegidas localmente
+- **Sin autenticación**: Acceso abierto pero validado
 
 ### v1.0.0 (Local)
 - **Sin APIs externas**: Todo funciona localmente
 - **Sin persistencia**: Los datos se pierden al cerrar el navegador
 - **Completamente privado**: Nada sale de tu dispositivo
 
-### Consideraciones de Seguridad
-- Las reglas de Firebase permiten lectura/escritura abierta para facilitar uso
-- Para producción, considera implementar autenticación
-- Los datos son visibles para todos los usuarios conectados
+### Consideraciones de Seguridad Actualizadas
+- **Reglas estrictas de Firebase** con validación de datos
+- **Monitoreo requerido** para detectar uso anómalo
+- **Credenciales en variables de entorno** únicamente
+- **Validaciones tanto cliente como servidor**
+- Para producción crítica, implementa autenticación completa
+
+### Archivos de Seguridad
+- `SECURITY.md` - Guía completa de seguridad y remediation
+- `firebase-rules.json` - Reglas de Firebase con validaciones
+- `src/utils/security.ts` - Utilidades de validación y sanitización
 
 ## 🤝 Contribuciones
 

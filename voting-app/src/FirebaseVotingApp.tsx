@@ -5,6 +5,15 @@ import confetti from 'canvas-confetti';
 import Confetti from 'react-confetti';
 import { database, DB_PATHS } from './firebase';
 import { ref, onValue, push, set } from 'firebase/database';
+import { 
+  validateUserName, 
+  validateSubmissionName, 
+  generateSecureUserId, 
+  sanitizeString,
+  votingRateLimiter,
+  submissionRateLimiter,
+  notificationRateLimiter 
+} from './utils/security';
 
 interface UserSubmission {
   name: string;
