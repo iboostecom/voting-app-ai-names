@@ -125,6 +125,10 @@ const FirebaseVotingApp = () => {
 
   // Configurar listeners de Firebase
   useEffect(() => {
+    console.log('🔥 Configurando Firebase listeners...');
+    console.log('Database config:', database);
+    console.log('DB_PATHS:', DB_PATHS);
+    
     const setupFirebaseListeners = () => {
       // Escuchar votos
       const votesRef = ref(database, DB_PATHS.votes);
@@ -196,10 +200,12 @@ const FirebaseVotingApp = () => {
         try {
           const cleanVoterName = confirmedVoter.replace(/[.#$[\]]/g, '_');
           const userRef = ref(database, `${DB_PATHS.activeUsers}/${cleanVoterName}`);
+          console.log('Actualizando actividad para:', confirmedVoter, '(', cleanVoterName, ')');
           await set(userRef, {
             name: confirmedVoter,
             lastActive: Date.now()
           });
+          console.log('Actividad actualizada exitosamente');
         } catch (error) {
           console.error('Error al actualizar actividad:', error);
         }
@@ -348,9 +354,11 @@ const FirebaseVotingApp = () => {
   };
 
   const getAllVoters = () => {
-    return Object.keys(votesByPerson).filter(voter => 
+    const voters = Object.keys(votesByPerson).filter(voter => 
       Object.values(votesByPerson[voter]).some(Boolean)
     );
+    console.log('getAllVoters - Total voters:', voters.length, 'votesByPerson:', votesByPerson);
+    return voters;
   };
 
   const getNamePopularity = (categoryId: string, name: string) => {
@@ -505,7 +513,14 @@ const FirebaseVotingApp = () => {
                 {Object.keys(activeUsers).length}
               </span>
             </div>
-            <div className="text-sm text-gray-600">Usuarios activos</div>
+            <div className="text-sm text-gray-600">
+              Usuarios activos
+              {process.env.NODE_ENV === 'development' && (
+                <div className="text-xs text-gray-400 mt-1">
+                  Debug: {JSON.stringify(Object.keys(activeUsers))}
+                </div>
+              )}
+            </div>
           </motion.div>
 
           <motion.div 
@@ -518,7 +533,14 @@ const FirebaseVotingApp = () => {
                 {getAllVoters().length}
               </span>
             </div>
-            <div className="text-sm text-gray-600">Total votantes</div>
+            <div className="text-sm text-gray-600">
+              Total votantes
+              {process.env.NODE_ENV === 'development' && (
+                <div className="text-xs text-gray-400 mt-1">
+                  Debug: {JSON.stringify(getAllVoters())}
+                </div>
+              )}
+            </div>
           </motion.div>
         </div>
 
