@@ -201,12 +201,13 @@ const FirebaseVotingApp = () => {
         try {
           const cleanVoterName = confirmedVoter.replace(/[.#$[\]]/g, '_');
           const userRef = ref(database, `${DB_PATHS.activeUsers}/${cleanVoterName}`);
-          console.log('Actualizando actividad para:', confirmedVoter, '(', cleanVoterName, ')');
+          const timestamp = Date.now();
+          console.log('Actualizando actividad para:', confirmedVoter, '(', cleanVoterName, ')', 'timestamp:', timestamp);
           await set(userRef, {
             name: confirmedVoter,
-            lastActive: Date.now()
+            lastActive: timestamp
           });
-          console.log('Actividad actualizada exitosamente');
+          console.log('✅ Actividad actualizada exitosamente para', confirmedVoter);
         } catch (error) {
           console.error('Error al actualizar actividad:', error);
         }
@@ -515,10 +516,10 @@ const FirebaseVotingApp = () => {
               </span>
             </div>
             <div className="text-sm text-gray-600">
-              Usuarios activos
+              Online ahora
               {process.env.NODE_ENV === 'development' && (
                 <div className="text-xs text-gray-400 mt-1">
-                  Debug: {JSON.stringify(Object.keys(activeUsers))}
+                  activeUsers: {JSON.stringify(Object.keys(activeUsers))}
                 </div>
               )}
             </div>
@@ -535,10 +536,10 @@ const FirebaseVotingApp = () => {
               </span>
             </div>
             <div className="text-sm text-gray-600">
-              Total votantes
+              Han votado
               {process.env.NODE_ENV === 'development' && (
                 <div className="text-xs text-gray-400 mt-1">
-                  Debug: {JSON.stringify(getAllVoters())}
+                  allVoters: {JSON.stringify(getAllVoters())}
                 </div>
               )}
             </div>
@@ -592,8 +593,8 @@ const FirebaseVotingApp = () => {
           {/* Resumen de actividad */}
           <div className="flex justify-between items-center mt-3 pt-3 border-t border-blue-200 text-xs">
             <span className="text-blue-600">
-              👥 {Object.keys(activeUsers).length} online • 
-              🗳️ {getAllVoters().length} han votado • 
+              🟢 {Object.keys(activeUsers).length} conectados • 
+              ✅ {getAllVoters().length} han votado • 
               💡 {getTotalUserSubmissions()} ideas
             </span>
             <span className="text-blue-500">
