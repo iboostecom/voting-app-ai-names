@@ -1,10 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Heart, HeartOff, Plus, X, Check, Users, Bell, Zap, TrendingUp } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import confetti from 'canvas-confetti';
-import Confetti from 'react-confetti';
-import { database, DB_PATHS } from './firebase';
-import { ref, onValue, push, set, remove, serverTimestamp, off } from 'firebase/database';
+import { useState } from 'react';
+import { Heart, HeartOff, Plus, X, Check } from 'lucide-react';
 
 interface UserSubmission {
   name: string;
@@ -41,14 +36,6 @@ const NamingVotingApp = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [submitterName, setSubmitterName] = useState('');
 
-  // Estados para funcionalidades divertidas
-  const [activeUsers, setActiveUsers] = useState<{[key: string]: ActiveUser}>({});
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [recentVotes, setRecentVotes] = useState<{[key: string]: number}>({});
-  
-  const userActivityRef = useRef<any>(null);
-  const lastNotificationRef = useRef<number>(Date.now());
 
   const categories = [
     {
@@ -159,7 +146,7 @@ const NamingVotingApp = () => {
         {
           name: newName.trim(),
           submitter: submitterName.trim(),
-          timestamp: new Date().toLocaleString()
+          timestamp: Date.now()
         }
       ]
     }));

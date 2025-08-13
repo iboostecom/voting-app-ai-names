@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import Confetti from 'react-confetti';
 import { database, DB_PATHS } from './firebase';
-import { ref, onValue, push, set, remove, serverTimestamp, off } from 'firebase/database';
+import { ref, onValue, push, set } from 'firebase/database';
 
 interface UserSubmission {
   name: string;
