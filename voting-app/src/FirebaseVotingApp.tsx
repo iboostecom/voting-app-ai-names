@@ -522,34 +522,62 @@ const FirebaseVotingApp = () => {
           </motion.div>
         </div>
 
-        {/* Notificaciones en tiempo real */}
-        {notifications.length > 0 && (
-          <motion.div 
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg p-4 mb-4"
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <Bell className="w-4 h-4 text-yellow-600" />
-              <span className="text-sm font-medium text-yellow-800">🔥 Actividad en vivo</span>
+        {/* Panel de actividad en vivo mejorado */}
+        <motion.div 
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4 mb-4"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Bell className="w-4 h-4 text-blue-600" />
+              <span className="text-sm font-medium text-blue-800">🔥 Actividad del Grupo</span>
             </div>
-            <div className="space-y-1 max-h-20 overflow-y-auto">
-              {notifications.slice(0, 3).map((notification) => (
+            <div className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+              {notifications.length} eventos
+            </div>
+          </div>
+
+          {notifications.length > 0 ? (
+            <div className="space-y-2 max-h-24 overflow-y-auto">
+              {notifications.slice(0, 5).map((notification) => (
                 <motion.div
                   key={notification.id}
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  className="text-xs text-yellow-700 flex items-center gap-2"
+                  className="bg-white/60 rounded-md px-3 py-2 text-xs text-gray-700 flex items-center gap-2 border"
                 >
-                  {notification.type === 'vote' && <Zap className="w-3 h-3 text-green-500" />}
-                  {notification.type === 'submission' && <Plus className="w-3 h-3 text-blue-500" />}
-                  {notification.type === 'user' && <Users className="w-3 h-3 text-purple-500" />}
-                  <span>{notification.message}</span>
+                  {notification.type === 'vote' && <div className="w-2 h-2 bg-green-500 rounded-full"></div>}
+                  {notification.type === 'submission' && <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}
+                  {notification.type === 'user' && <div className="w-2 h-2 bg-purple-500 rounded-full"></div>}
+                  <span className="flex-1">{notification.message}</span>
+                  <span className="text-gray-400 text-xs">
+                    {new Date(notification.timestamp).toLocaleTimeString('es-ES', {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
                 </motion.div>
               ))}
             </div>
-          </motion.div>
-        )}
+          ) : (
+            <div className="text-center text-gray-500 text-xs py-2">
+              Sin actividad reciente - ¡Sé el primero en votar! 🗳️
+            </div>
+          )}
+
+          {/* Resumen de actividad */}
+          <div className="flex justify-between items-center mt-3 pt-3 border-t border-blue-200 text-xs">
+            <span className="text-blue-600">
+              👥 {Object.keys(activeUsers).length} online • 
+              🗳️ {getAllVoters().length} han votado • 
+              💡 {getTotalUserSubmissions()} ideas
+            </span>
+            <span className="text-blue-500">
+              ⚡ En tiempo real
+            </span>
+          </div>
+        </motion.div>
 
         <div className="text-center">
           <motion.button
@@ -755,18 +783,6 @@ const FirebaseVotingApp = () => {
                       )}
                     </div>
 
-                    {/* Badge de seleccionado */}
-                    {isVoted && (
-                      <motion.div 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="absolute bottom-2 left-2"
-                      >
-                        <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-medium">
-                          ✓ Seleccionado
-                        </span>
-                      </motion.div>
-                    )}
                   </motion.button>
                 );
               })}
@@ -849,17 +865,6 @@ const FirebaseVotingApp = () => {
                             )}
                           </div>
 
-                          {isVoted && (
-                            <motion.div 
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="absolute bottom-2 left-2"
-                            >
-                              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-medium">
-                                ✓ Seleccionado
-                              </span>
-                            </motion.div>
-                          )}
                         </motion.button>
                       </motion.div>
                     );
