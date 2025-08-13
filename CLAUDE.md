@@ -4,70 +4,129 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a React-based voting application for selecting AI service names. The app allows users to vote on predefined names across different categories and submit their own suggestions.
+This is a React-based voting application for selecting AI service names with real-time collaboration features. The app allows users to vote on predefined names across different categories, submit their own suggestions, and see live activity from other users.
 
 ## Architecture
 
-### Single File Structure
-- `naming-voting-app.tsx` - Main React component containing the entire application
-- No build configuration files, package.json, or additional dependencies detected
-- Standalone React component using modern hooks (useState)
+The project contains two versions:
+- **v2.0.0 (Current)**: Real-time collaborative version using Firebase (`voting-app/`)
+- **v1.0.0 (Legacy)**: Standalone local version (`naming-voting-app.tsx`)
 
-### Key Components
+### Main Application Structure (v2.0.0)
 
-The application is structured as a single React functional component with the following main features:
+Located in `voting-app/src/`:
+- `FirebaseVotingApp.tsx` - Main React component with real-time features
+- `firebase.ts` - Firebase configuration and database paths
+- `App.tsx` - Application entry point
+- `main.tsx` - Vite entry point
 
-1. **Category-based Name Organization**: Names are organized into 7 categories:
-   - Hispanic/Latina culture names
-   - Speed-focused names  
-   - Modular/adaptable names
-   - LATAM regional tech names
-   - Futuristic AI names
-   - Value-focused Spanish names
-   - Value-focused English names
+### Key Components (v2.0.0)
 
-2. **State Management**: Uses React useState hooks for:
-   - `votes` - Tracks selected names by category-name key
-   - `userSubmissions` - Stores user-contributed names by category
-   - `showAddForm` - Controls modal visibility
-   - Form input states for new submissions
+The main application (`FirebaseVotingApp.tsx`) includes:
 
-3. **Key Functions**:
-   - `handleVote()` - Toggles vote status for names
-   - `handleAddName()` - Adds user-submitted names to categories
-   - `removeUserSubmission()` - Removes user-contributed names
-   - Various counting utilities for vote statistics
+1. **Real-time Voting System**: 
+   - `votesByPerson` - Tracks all votes by user across categories
+   - Live synchronization via Firebase Realtime Database
+   - Vote keys: `{categoryId}-{name}` for predefined, `{categoryId}-user-{name}` for user submissions
 
-### UI Structure
+2. **Collaborative Features**:
+   - `activeUsers` - Live tracking of users currently voting
+   - `notifications` - Real-time activity feed showing votes and submissions
+   - Instant visual feedback with confetti and animations
 
-- **Header**: Vote counter, user submissions counter, and "Add Name" button
-- **Modal Form**: For submitting new name suggestions with submitter info
-- **Category Cards**: Each category displays as a card with:
-  - Predefined names in a responsive grid
-  - User-submitted names section (if any)
-  - Vote counts and quick-add button
-- **Summary Section**: Shows selected favorites with copy-to-clipboard functionality
-- **Instructions**: How-to-vote guidance at bottom
+3. **Category Organization**: 7 categories with themed names:
+   - Hispanic/Latina culture (`hispanic`)
+   - Speed-focused (`speed`)
+   - Modular/adaptable (`modular`) 
+   - LATAM regional tech (`regional`)
+   - Futuristic AI (`futuristic`)
+   - Value-focused Spanish (`spanish_values`)
+   - Value-focused English (`english_values`)
 
-## Development Notes
+4. **User Management**:
+   - `currentVoter`/`confirmedVoter` - User identification system
+   - `userSubmissions` - Category-based custom name submissions
+   - User activity tracking for presence detection
 
-### Styling
-- Uses Tailwind CSS classes extensively
-- Responsive design with breakpoints (md:, lg:)
-- Color-coded categories with consistent design patterns
-- Hover effects and transitions for interactivity
+## Development Commands
+
+Navigate to `voting-app/` directory first:
+
+```bash
+cd voting-app
+```
+
+### Setup and Development
+- `npm install` - Install dependencies
+- `npm run dev` - Start development server (Vite)
+- `npm run build` - Build for production
+- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build
+
+### Firebase Configuration
+
+1. Create `.env` file in `voting-app/` with:
+   ```
+   VITE_FIREBASE_API_KEY=your_api_key
+   VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+   VITE_FIREBASE_DATABASE_URL=https://your_project.firebaseio.com
+   VITE_FIREBASE_PROJECT_ID=your_project_id
+   VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+   VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   VITE_FIREBASE_APP_ID=your_app_id
+   ```
+
+2. Apply Firebase rules from `firebase-rules.json` to Realtime Database
+
+## Technology Stack
 
 ### Dependencies
-- React with hooks
-- Lucide React for icons (Heart, HeartOff, Plus, X, Check)
-- Assumes Tailwind CSS is available in build environment
+- **React 19** with hooks and TypeScript
+- **Firebase** for real-time database
+- **Framer Motion** for animations
+- **Canvas Confetti & React Confetti** for celebration effects
+- **Lucide React** for icons
+- **Tailwind CSS** for styling
 
-### Data Flow
-- All state is local to the main component
-- No external API calls or persistence
-- Data persists only during session (no localStorage/database)
-- Vote keys use format: `{categoryId}-{name}` for original names, `{categoryId}-user-{name}` for user submissions
+### Build Tools
+- **Vite** as build tool and dev server
+- **TypeScript** for type safety
+- **ESLint** for code linting
+- **PostCSS + Autoprefixer** for CSS processing
 
-## Development Workflow
+## Data Structure
 
-Since no package.json or build configuration exists, this appears to be a standalone React component that would need to be integrated into a larger React application or development environment with appropriate build tools and dependencies.
+### Firebase Realtime Database
+```
+votes/
+  {userId}/
+    {voteKey}: boolean
+
+userSubmissions/
+  {categoryId}/
+    {submissionId}: {
+      name: string,
+      submitter: string,
+      timestamp: number
+    }
+
+activeUsers/
+  {userId}: {
+    name: string,
+    lastActive: number
+  }
+
+notifications/
+  {notificationId}: {
+    message: string,
+    timestamp: number,
+    type: 'vote' | 'submission' | 'user'
+  }
+```
+
+## Security Considerations
+
+- Firebase rules allow open read/write access for ease of use
+- No authentication system implemented (by design for quick access)
+- All data is publicly visible to connected users
+- For production, implement proper authentication and access controls

@@ -1,0 +1,22 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": true,
+    "votes": {
+      ".read": true,
+      ".write": true
+    },
+    "userSubmissions": {
+      ".read": true,
+      ".write": true
+    },
+    "activeUsers": {
+      ".read": true,
+      ".write": true
+    },
+    "notifications": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
